@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RH Partners Portal</title>
+<meta name="description" content="RH Partners Client &amp; Project Portal — akses terbatas.">
+<meta name="color-scheme" content="dark">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://esm.sh https://cdn.jsdelivr.net /cdn-cgi/;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com;
+  connect-src 'self' https://*.supabase.co wss://*.supabase.co https://esm.sh https://*.esm.sh;
+  img-src 'self' data: https: blob:;
+  media-src 'self' blob:;
+  worker-src 'self' blob:;
+  frame-ancestors 'none';
+">
+<meta http-equiv="X-Frame-Options" content="DENY">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js" integrity="sha512-VPRz/V4yaMpW6HQcHPv6MwrWdBNK2e6s+fZ2b0bJiMeUxHJikNBmI1rZRwDIlBKD6dkqygJJLbFqVlJy4kMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+<!-- ═══════ LOGIN ═══════ -->
+<div id="scr-login" class="scr on">
+  <div class="ln-bg"></div>
+  <div class="ln-grid"></div>
+  <div class="ln-wrap">
+    <div class="ln-brand">
+      <div class="ln-logo">RH<span>Partners</span></div>
+      <div class="ln-tag">Client &amp; Project Portal</div>
+    </div>
+    <div class="ln-card">
+      <div class="ln-tabs">
+        <div class="ltab on" id="lt-klien" onclick="setLnMode('klien')">👤 Klien</div>
+        <div class="ltab adm" id="lt-admin" onclick="setLnMode('admin')">⚙️ Admin</div>
+      </div>
+      <div class="fg"><label>Email</label>
+        <input type="email" id="ln-email" placeholder="email@domain.com" autocomplete="email"
+          onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="fg"><label>Password</label>
+        <div class="pw-wrap">
+          <input type="password" id="ln-pass" placeholder="••••••••" autocomplete="current-password"
+            onkeydown="if(event.key==='Enter')doLogin()"
+            oninput="updatePwStrength(this.value)">
+          <button class="pw-eye" id="pw-eye" onclick="togglePw()" type="button">👁</button>
+        </div>
+        <div id="pw-strength-wrap" style="display:none;margin-top:6px">
+          <div style="height:3px;background:var(--s3);border-radius:3px;overflow:hidden">
+            <div id="pw-strength-bar" style="height:100%;width:0%;transition:all .3s;border-radius:3px"></div>
+          </div>
+          <div id="pw-strength-label" style="font-size:10px;color:var(--m1);margin-top:3px"></div>
+        </div>
+      </div>
+      <button class="btn-login" onclick="doLogin()">Masuk ke Portal</button>
+      <div class="ln-err" id="ln-err"></div>
+      <div class="ln-hint" id="ln-hint">Masuk menggunakan akun administrator.</div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Setup Awal -->
+<div class="mbg" id="m-first-setup">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-t">🚀 Setup Awal RH Partners Portal</div>
+    <div class="info-box" style="margin-bottom:12px">RH Partners Portal ini belum memiliki akun admin. Isi data di bawah untuk membuat akun admin pertama dan menyiapkan portal agar langsung siap dipakai.</div>
+    <div class="fg2">
+      <div class="fg"><label>Nama Studio</label><input type="text" id="fs-studio" placeholder="Contoh: Studio Kreatif Nusantara"></div>
+      <div class="fg"><label>Nama Admin</label><input type="text" id="fs-admin-name" placeholder="Contoh: Admin Utama"></div>
+    </div>
+    <div class="fg2">
+      <div class="fg"><label>Email Admin</label><input type="email" id="fs-admin-email" placeholder="admin@domain.com"></div>
+      <div class="fg"><label>WhatsApp</label><input type="text" id="fs-admin-wa" placeholder="62812xxxxxxx"></div>
+    </div>
+    <div class="fg2">
+      <div class="fg"><label>Password</label><input type="password" id="fs-admin-pass" placeholder="Minimal 8 karakter, ada huruf besar & angka"></div>
+      <div class="fg"><label>Konfirmasi Password</label><input type="password" id="fs-admin-pass2" placeholder="Ulangi password"></div>
+    </div>
+    <div class="row-acts">
+      <button class="btn btn-cu" onclick="bootstrapPortal()">Buat Portal</button>
+      <button class="btn btn-ol" type="button" onclick="showToast('Selesaikan setup awal agar portal bisa dipakai.','inf')">Isi Nanti</button>
+    </div>
+    <div class="ln-err" id="fs-err" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- ═══════ APP ═══════ -->
+<div id="scr-app" class="scr">
+  <!-- Sidebar -->
+  <aside class="sb">
+    <div class="sb-hd">
+      <div class="sb-logo">RH<span>Partners</span></div>
+      <div class="sb-usr">
+        <div class="av" id="sb-av">?</div>
+        <div style="min-width:0">
+          <div class="sb-un" id="sb-un">—</div>
+          <div class="sb-ur" id="sb-ur">—</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sb-nav" id="sb-nav"></nav>
+    <div class="sb-ft">
+      <button class="lo-btn" onclick="doLogout()">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Keluar
+      </button>
+    </div>
+  </aside>
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-title" id="pg-title">Dashboard</div>
+      <div class="tb-r">
+        <div class="icon-btn" title="Notifikasi">🔔<div class="notif-dot"></div></div>
+        <button class="btn btn-cu" id="tb-act" style="display:none" onclick="openModal('m-upload')">+ Upload</button>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- ═══════ MODALS ═══════ -->
+
+<!-- Upload Gabungan -->
+<div class="mbg" id="m-upload">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-t">📤 Upload File</div>
+    <div class="tabs" id="uptabs">
+      <div class="tab on" onclick="setUpTab('rev',this)">📄 Revisi</div>
+      <div class="tab" onclick="setUpTab('rek',this)">🎙️ Rekaman</div>
+    </div>
+    <!-- REVISI -->
+    <div id="up-rev">
+      <div class="fg"><label>Proyek</label>
+        <select id="ur-proj"><option value="">— Pilih Proyek —</option></select>
+      </div>
+      <div class="fg2">
+        <div class="fg" style="margin-bottom:0"><label>Versi</label><input type="text" id="ur-ver" placeholder="cth. v2.1"></div>
+        <div class="fg" style="margin-bottom:0"><label>Tanggal</label><input type="text" id="ur-tgl" placeholder="DD/MM/YYYY"></div>
+      </div>
+      <div class="fg" style="margin-top:15px"><label>Catatan Revisi</label>
+        <textarea id="ur-note" placeholder="Jelaskan perubahan yang dilakukan..."></textarea>
+      </div>
+      <div class="upz" id="ur-zone" ondragover="onDragOver(event,'ur-zone')" ondragleave="onDragLeave('ur-zone')" ondrop="onDrop(event,'ur-files')">
+        <div class="upz-ic">📎</div>
+        <div class="upz-t">Seret atau klik untuk upload</div>
+        <div class="upz-s">PDF · ZIP · PNG · AI · PSD — Maks 50MB</div>
+        <input type="file" multiple onchange="onFileInput(event,'ur-files')">
+      </div>
+      <div id="ur-files-list" style="margin-top:6px"></div>
+    </div>
+    <!-- REKAMAN -->
+    <div id="up-rek" style="display:none">
+      <div class="fg"><label>Proyek</label>
+        <select id="urk-proj"><option value="">— Pilih Proyek —</option></select>
+      </div>
+      <div class="fg"><label>Judul Rekaman</label>
+        <input type="text" id="urk-judul" placeholder="cth. Feedback Halaman Utama">
+      </div>
+      <div class="fg"><label>Catatan</label>
+        <textarea id="urk-note" placeholder="Instruksi atau keterangan..."></textarea>
+      </div>
+      <canvas class="rec-cv" id="m-cv"></canvas>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div class="rec-timer" id="m-timer">00:00</div>
+        <div id="m-pulse" style="display:none"><div class="rec-pulse"></div></div>
+        <span style="font-size:11px;color:var(--m1);margin-left:auto" id="m-rec-status">Siap merekam</span>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn btn-rd btn-sm" id="m-btn-start" type="button" onclick="mStartRec()">⏺ Mulai</button>
+        <button class="btn btn-gh btn-sm" id="m-btn-pause" type="button" style="display:none" onclick="mPauseRec()">⏸ Jeda</button>
+        <button class="btn btn-gh btn-sm" id="m-btn-stop" type="button" style="display:none" onclick="mStopRec()">⏹ Stop</button>
+      </div>
+      <div id="m-blobs"></div>
+      <div class="sep"><div class="sep-line"></div>atau upload file<div class="sep-line"></div></div>
+      <div class="upz" id="urk-zone" style="padding:18px" ondragover="onDragOver(event,'urk-zone')" ondragleave="onDragLeave('urk-zone')" ondrop="onDrop(event,'urk-files')">
+        <div class="upz-ic" style="font-size:20px">🎵</div>
+        <div class="upz-t" style="font-size:12px">Upload File Audio / Video</div>
+        <div class="upz-s">MP3 · WAV · M4A · MP4 · WEBM</div>
+        <input type="file" accept="audio/*,video/*" multiple onchange="onFileInput(event,'urk-files')">
+      </div>
+      <div id="urk-files-list" style="margin-top:6px"></div>
+    </div>
+    <div id="up-prog" style="display:none;margin-top:10px">
+      <div style="font-size:11px;color:var(--m1);margin-bottom:4px">Mengirim...</div>
+      <div class="pbar"><div class="pfill" id="up-pfill" style="width:0%"></div></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ol" onclick="closeModal('m-upload')" type="button">Batal</button>
+      <button class="btn btn-cu" onclick="submitUpload()" type="button">Kirim</button>
+    </div>
+  </div>
+</div>
+
+<!-- Buat Invoice -->
+<div class="mbg" id="m-inv">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-t">🧾 Buat Invoice</div>
+    <div class="fg"><label>Klien</label><select id="inv-client" class="cms-inp"></select></div>
+    <div class="fg"><label>Deskripsi Layanan</label><input type="text" id="inv-desc" class="cms-inp" placeholder="cth. Desain Website – Fase 2"></div>
+    <div class="fg2">
+      <div class="fg" style="margin-bottom:0"><label>Jumlah (Rp)</label><input type="number" id="inv-amt" class="cms-inp" placeholder="0"></div>
+      <div class="fg" style="margin-bottom:0"><label>Jatuh Tempo</label><input type="text" id="inv-due" class="cms-inp" placeholder="DD/MM/YYYY"></div>
+    </div>
+    <div class="fg" style="margin-top:15px"><label>Catatan</label><textarea id="inv-note" class="cms-ta" placeholder="Opsional..."></textarea></div>
+    <div class="modal-ft">
+      <button class="btn btn-ol" onclick="closeModal('m-inv')" type="button">Batal</button>
+      <button class="btn btn-cu" onclick="doCreateInv()" type="button">Buat Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tambah Klien -->
+<div class="mbg" id="m-addklien">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-t">👤 Tambah Klien Baru</div>
+    <div class="fg2">
+      <div class="fg" style="margin-bottom:0"><label>Nama Lengkap</label><input type="text" id="ak-nama" class="cms-inp" placeholder="Nama Lengkap"></div>
+      <div class="fg" style="margin-bottom:0"><label>Email</label><input type="email" id="ak-email" class="cms-inp" placeholder="email@domain.com"></div>
+    </div>
+    <div class="fg" style="margin-top:15px"><label>Password Awal</label><input type="text" id="ak-pass" class="cms-inp" placeholder="Min. 6 karakter"></div>
+    <div class="fg2">
+      <div class="fg" style="margin-bottom:0"><label>WhatsApp</label><input type="text" id="ak-wa" class="cms-inp" placeholder="+62..."></div>
+      <div class="fg" style="margin-bottom:0"><label>Proyek</label><input type="text" id="ak-proj" class="cms-inp" placeholder="Nama Proyek"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ol" onclick="closeModal('m-addklien')" type="button">Batal</button>
+      <button class="btn btn-cu" onclick="doAddKlien()" type="button">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Klien + Ubah Password -->
+<div class="mbg" id="m-editklien">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-t" id="ek-title">✏️ Edit Klien</div>
+    <input type="hidden" id="ek-idx">
+    <div class="tabs" id="ek-tabs">
+      <div class="tab on" onclick="setEkTab('info',this)">Informasi</div>
+      <div class="tab" onclick="setEkTab('pass',this)">🔑 Ubah Password</div>
+    </div>
+    <div id="ek-info">
+      <div class="fg"><label>Nama Lengkap</label><input type="text" id="ek-nama" class="cms-inp"></div>
+      <div class="fg"><label>Email</label><input type="email" id="ek-email" class="cms-inp"></div>
+      <div class="fg"><label>WhatsApp</label><input type="text" id="ek-wa" class="cms-inp"></div>
+      <div class="fg"><label>Proyek</label><input type="text" id="ek-proj" class="cms-inp"></div>
+    </div>
+    <div id="ek-pass" style="display:none">
+      <div class="warn-box" style="margin-bottom:15px">⚠️ Password baru akan langsung aktif untuk akun klien ini.</div>
+      <div class="fg"><label>Password Baru</label><input type="password" id="ek-p1" class="cms-inp" placeholder="Min. 6 karakter"></div>
+      <div class="fg"><label>Konfirmasi Password</label><input type="password" id="ek-p2" class="cms-inp" placeholder="Ulangi password"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ol" onclick="closeModal('m-editklien')" type="button">Batal</button>
+      <button class="btn btn-cu" onclick="doSaveKlien()" type="button">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Upload -->
+<div class="mbg" id="m-detail">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-t" id="dt-title">Detail</div>
+    <div id="dt-body"></div>
+    <div class="modal-ft" id="dt-foot"></div>
+  </div>
+</div>
+
+<!-- CMS Edit Modal -->
+<div class="mbg" id="m-cms">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-t" id="cms-mt">Edit</div>
+    <div id="cms-body"></div>
+    <div class="modal-ft">
+      <button class="btn btn-ol" onclick="closeModal('m-cms')" type="button">Batal</button>
+      <button class="btn btn-cu" onclick="saveCmsItem()" type="button">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bukti Bayar Klien -->
+<div class="mbg" id="m-pay">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-t">💳 Upload Bukti Pembayaran</div>
+    <div class="fg"><label>Invoice</label><select id="py-inv" class="cms-inp"></select></div>
+    <div class="fg2">
+      <div class="fg" style="margin-bottom:0"><label>Metode</label>
+        <select id="py-meth" class="cms-inp">
+          <option>Transfer BCA</option><option>Transfer Mandiri</option><option>QRIS</option><option>GoPay/OVO</option>
+        </select>
+      </div>
+      <div class="fg" style="margin-bottom:0"><label>Jumlah (Rp)</label><input type="number" id="py-amt" class="cms-inp" placeholder="0"></div>
+    </div>
+    <div class="fg2">
+      <div class="fg" style="margin-bottom:0"><label>Tanggal</label><input type="text" id="py-tgl" class="cms-inp" placeholder="DD/MM/YYYY"></div>
+      <div class="fg" style="margin-bottom:0"><label>Kode Referensi</label><input type="text" id="py-ref" class="cms-inp" placeholder="TRF..."></div>
+    </div>
+    <div class="fg" style="margin-top:15px"><label>Bukti Transfer</label>
+      <div class="upz" style="padding:16px">
+        <div class="upz-ic" style="font-size:20px">🧾</div>
+        <div class="upz-t" style="font-size:12px">Upload Bukti Transfer</div>
+        <input type="file" accept="image/*,.pdf" id="py-file-input" onchange="pyFileIn(event)">
+      </div>
+      <div id="py-file-prev" style="margin-top:6px"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ol" onclick="closeModal('m-pay')" type="button">Batal</button>
+      <button class="btn btn-cu" onclick="submitPay()" type="button">Kirim Bukti</button>
+    </div>
+  </div>
+</div>
+
+<div class="tw" id="toasts"></div>
+
+
+  <!-- Supabase Config (harus sebelum supabase.js) -->
+  <script>
+  window.STUDIOPORTAL_SUPABASE_CONFIG = {
+    url: 'https://jlhxfmrsvqjgdvvbdxhu.supabase.co',
+    anonKey: 'sb_publishable_TiLYPz18uO1P7hsapStQlQ_gpml403T',
+    buckets: { revisi:'revisi', rekaman:'rekaman', pembayaran:'pembayaran', hasil:'hasil' }
+  };
+  </script>
+  <!-- App Logic -->
+  <script src="app.js"></script>
+  <!-- Supabase Storage & DB Sync -->
+  <script type="module" src="supabase.js"></script>
+</body>
+</html>
